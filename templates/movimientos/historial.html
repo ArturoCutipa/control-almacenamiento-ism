@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}Movimientos{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3"><i class="bi bi-list-ul"></i> Movimientos</h1>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-6 col-md-2"><select name="tipo" class="form-select" aria-label="Tipo"><option value="">Todos los tipos</option>{% for c, n in tipos %}<option value="{{ c }}" {% if filtros.tipo == c %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-md-2"><input type="date" name="desde" value="{{ filtros.desde }}" class="form-control" aria-label="Desde"></div>
+  <div class="col-6 col-md-2"><input type="date" name="hasta" value="{{ filtros.hasta }}" class="form-control" aria-label="Hasta"></div>
+  <div class="col-6 col-md-3"><input name="q" value="{{ filtros.q }}" class="form-control" placeholder="Lote o código de barras"></div>
+  <div class="col-md-3"><button class="btn btn-ism w-100"><i class="bi bi-funnel"></i> Filtrar</button></div>
+</form>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-sm tabla-compacta mb-0">
+  <thead><tr><th>Fecha</th><th>Tipo</th><th>Producto</th><th>Lote</th><th class="text-end">Cajas</th><th>Origen</th><th>Destino</th><th>Usuario</th><th>Motivo</th></tr></thead>
+  <tbody>{% for m in pagina %}
+    <tr><td>{{ m.fecha_hora|date:"d/m/Y H:i" }}</td><td><span class="badge text-bg-{% if m.tipo == 'ENTRADA' %}success{% elif m.tipo == 'SALIDA' %}primary{% elif m.tipo == 'AJUSTE' %}warning{% else %}secondary{% endif %}">{{ m.get_tipo_display }}</span></td>
+      <td>{{ m.lote.producto }}</td><td><a href="{% url 'inventario:lote' m.lote_id %}">{{ m.lote.numero_lote }}</a></td><td class="text-end">{{ m.cantidad }}</td>
+      <td>{{ m.ubicacion_origen|default:"" }}</td><td>{{ m.ubicacion_destino|default:"" }}</td><td>{{ m.usuario }}</td><td class="small">{{ m.motivo }}</td></tr>
+  {% empty %}<tr><td colspan="9" class="text-muted">Sin movimientos para los filtros elegidos.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% include "partials/paginacion.html" %}
+{% endblock %}

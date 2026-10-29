@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block titulo %}Usuarios{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h1 class="h3 mb-0"><i class="bi bi-people"></i> Usuarios</h1>
+  <a class="btn btn-ism" href="{% url 'usuarios:nuevo' %}"><i class="bi bi-person-plus"></i> Nuevo usuario</a>
+</div>
+<form method="get" class="d-flex gap-2 mb-3"><input name="q" value="{{ q }}" class="form-control" placeholder="Buscar por usuario o nombre" aria-label="Buscar"><button class="btn btn-outline-secondary">Buscar</button></form>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover tabla-compacta mb-0">
+  <thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Último ingreso</th><th>Estado</th><th></th></tr></thead>
+  <tbody>{% for u in usuarios %}
+    <tr><td class="fw-semibold">{{ u.username }}</td><td>{{ u.get_full_name }}</td><td>{{ u.rol|default:"—" }}</td><td>{{ u.last_login|date:"d/m/Y H:i"|default:"—" }}</td>
+      <td>{% if u.is_active %}<span class="badge bg-success">Activo</span>{% else %}<span class="badge bg-secondary">Inactivo</span>{% endif %}</td>
+      <td class="text-nowrap"><a class="btn btn-sm btn-outline-secondary" href="{% url 'usuarios:editar' u.pk %}" aria-label="Editar"><i class="bi bi-pencil"></i></a>
+        {% if u != user %}<form method="post" action="{% url 'usuarios:estado' u.pk %}" class="d-inline">{% csrf_token %}<button class="btn btn-sm {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}">{% if u.is_active %}Desactivar{% else %}Activar{% endif %}</button></form>{% endif %}</td></tr>
+  {% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

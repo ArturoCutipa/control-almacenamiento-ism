@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}{% if producto %}Editar producto{% else %}Nuevo producto{% endif %}{% endblock %}
+{% block contenido %}
+<div class="row justify-content-center"><div class="col-md-8 col-lg-6"><div class="card shadow-sm"><div class="card-body p-4">
+  <h1 class="h4">{% if producto %}Editar {{ producto }}{% else %}Nuevo producto{% endif %}</h1>
+  <p class="text-muted small">Se usa el código de barras que el producto trae de fábrica; no se reetiqueta (RN-03).</p>
+  <form method="post">{% csrf_token %}{% include "partials/campos.html" %}
+    <button class="btn btn-ism btn-lg w-100">Guardar</button>
+    <a class="btn btn-link w-100" href="{% url 'catalogo:lista' %}">Cancelar</a></form>
+</div></div></div></div>
+{% endblock %}

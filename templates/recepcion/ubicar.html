@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Ubicar pallet{% endblock %}
+{% block contenido %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm"><div class="card-body p-4">
+      <h1 class="h4"><i class="bi bi-qr-code-scan"></i> Ubicar pallet</h1>
+      <dl class="row mb-3">
+        <dt class="col-5">Producto</dt><dd class="col-7">{{ det.lote.producto }}</dd>
+        <dt class="col-5">Lote</dt><dd class="col-7">{{ det.lote.numero_lote }} · vence {{ det.lote.fecha_vencimiento|date:"d/m/Y" }}</dd>
+        <dt class="col-5">Cantidad</dt><dd class="col-7">{{ det.cantidad_cajas }} cajas ({{ det.pallets }} pallet{{ det.pallets|pluralize }})</dd>
+      </dl>
+      <form method="post">{% csrf_token %}{% include "partials/campos.html" %}
+        <button class="btn btn-ism btn-lg w-100"><i class="bi bi-check2-circle"></i> Confirmar ubicación</button>
+      </form>
+      <a class="btn btn-link w-100 mt-2" href="{% url 'recepcion:detalle' det.recepcion_id %}">Ubicar después</a>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

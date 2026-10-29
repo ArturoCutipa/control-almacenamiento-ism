@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Conteos{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3"><i class="bi bi-clipboard-check"></i> Conteo físico</h1>
+{% if pendientes and ES_ENCARGADO %}<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> Hay {{ pendientes }} diferencia(s) pendientes de aprobación.</div>{% endif %}
+<div class="row g-3">
+  <div class="col-md-5"><div class="card shadow-sm"><div class="card-body">
+    <h2 class="h5">Nuevo conteo</h2>
+    <form method="post">{% csrf_token %}{% include "partials/campos.html" %}
+      <button class="btn btn-ism btn-lg w-100"><i class="bi bi-play-circle"></i> Iniciar conteo</button></form>
+  </div></div></div>
+  <div class="col-md-7"><div class="card shadow-sm"><div class="card-header bg-white fw-semibold">Conteos recientes</div>
+    <div class="table-responsive"><table class="table table-hover tabla-compacta mb-0">
+      <thead><tr><th>N.°</th><th>Fecha</th><th>Descripción</th><th>Responsable</th><th>Estado</th></tr></thead>
+      <tbody>{% for c in conteos %}<tr><td><a href="{% url 'conteos:detalle' c.pk %}">{{ c.pk }}</a></td><td>{{ c.fecha|date:"d/m/Y" }}</td><td>{{ c.descripcion }}</td><td>{{ c.usuario }}</td>
+        <td>{% if c.estado == 'CERRADO' %}<span class="badge bg-secondary">Cerrado</span>{% else %}<span class="badge bg-success">Abierto</span>{% endif %}</td></tr>
+      {% empty %}<tr><td colspan="5" class="text-muted">Aún no hay conteos.</td></tr>{% endfor %}</tbody>
+    </table></div></div></div>
+</div>
+{% endblock %}

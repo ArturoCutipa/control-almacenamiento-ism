@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block titulo %}Panel{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3">Hola, {{ user.first_name|default:user.username }}</h1>
+
+<div class="row g-3 mb-4">
+  {% if ES_OPERARIO %}
+  <div class="col-6 col-md-3"><a class="tarjeta-accion card card-body text-center shadow-sm" href="{% url 'recepcion:lista' %}"><i class="bi bi-truck"></i><span class="fw-semibold mt-1">Registrar recepción</span></a></div>
+  <div class="col-6 col-md-3"><a class="tarjeta-accion card card-body text-center shadow-sm" href="{% url 'movimientos:salida' %}"><i class="bi bi-box-arrow-right"></i><span class="fw-semibold mt-1">Salida FEFO</span></a></div>
+  <div class="col-6 col-md-3"><a class="tarjeta-accion card card-body text-center shadow-sm" href="{% url 'movimientos:transferencia' %}"><i class="bi bi-arrow-left-right"></i><span class="fw-semibold mt-1">Transferencia</span></a></div>
+  <div class="col-6 col-md-3"><a class="tarjeta-accion card card-body text-center shadow-sm" href="{% url 'conteos:lista' %}"><i class="bi bi-clipboard-check"></i><span class="fw-semibold mt-1">Conteo físico</span></a></div>
+  {% endif %}
+  {% if ES_ENCARGADO %}
+  <div class="col-6 col-md-3"><a class="tarjeta-accion card card-body text-center shadow-sm" href="{% url 'integracion_sap:exportar' %}"><i class="bi bi-file-earmark-excel"></i><span class="fw-semibold mt-1">Exportar a SAP</span></a></div>
+  <div class="col-6 col-md-3"><a class="tarjeta-accion card card-body text-center shadow-sm" href="{% url 'ubicaciones:mapa' %}"><i class="bi bi-map"></i><span class="fw-semibold mt-1">Mapa del almacén</span></a></div>
+  {% endif %}
+  {% if ES_PLANIFICACION %}
+  <div class="col-6 col-md-3"><a class="tarjeta-accion card card-body text-center shadow-sm" href="{% url 'alertas:lista' %}"><i class="bi bi-bell"></i><span class="fw-semibold mt-1">Alertas de vencimiento</span></a></div>
+  <div class="col-6 col-md-3"><a class="tarjeta-accion card card-body text-center shadow-sm" href="{% url 'reportes:reportes' %}"><i class="bi bi-bar-chart"></i><span class="fw-semibold mt-1">Reportes</span></a></div>
+  {% endif %}
+  <div class="col-6 col-md-3"><a class="tarjeta-accion card card-body text-center shadow-sm" href="{% url 'inventario:consulta' %}"><i class="bi bi-search"></i><span class="fw-semibold mt-1">Consultar stock</span></a></div>
+  {% if ES_ADMIN %}
+  <div class="col-6 col-md-3"><a class="tarjeta-accion card card-body text-center shadow-sm" href="{% url 'usuarios:lista' %}"><i class="bi bi-people"></i><span class="fw-semibold mt-1">Usuarios</span></a></div>
+  {% endif %}
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="card card-body indicador shadow-sm"><span class="text-muted">Alertas abiertas</span><span class="valor {% if ind.alertas %}text-danger{% endif %}">{{ ind.alertas }}</span><small class="text-muted">{{ ind.vencidos }} lote(s) vencido(s)</small></div></div>
+  <div class="col-6 col-lg-3"><div class="card card-body indicador shadow-sm"><span class="text-muted">Recepciones de hoy</span><span class="valor">{{ ind.recepciones_hoy }}</span><small class="text-muted">{{ ind.recepciones_abiertas }} en curso</small></div></div>
+  <div class="col-6 col-lg-3"><div class="card card-body indicador shadow-sm"><span class="text-muted">Ajustes por aprobar</span><span class="valor {% if ind.pendientes_ajuste %}text-warning{% endif %}">{{ ind.pendientes_ajuste }}</span><small class="text-muted">{{ ind.movimientos_hoy }} movimientos hoy</small></div></div>
+  <div class="col-6 col-lg-3"><div class="card card-body indicador shadow-sm"><span class="text-muted">Ocupación del almacén</span><span class="valor">{{ ind.ocupacion }}%</span><small class="text-muted">{{ ind.pallets }} pallets · {{ ind.cajas|intcomma }} cajas</small></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card shadow-sm"><div class="card-header bg-white fw-semibold">Últimos movimientos</div>
+      <div class="table-responsive"><table class="table table-sm tabla-compacta mb-0">
+        <thead><tr><th>Fecha</th><th>Tipo</th><th>Lote</th><th class="text-end">Cajas</th><th>Usuario</th></tr></thead>
+        <tbody>{% for m in ultimos %}<tr><td>{{ m.fecha_hora|date:"d/m H:i" }}</td><td>{{ m.get_tipo_display }}</td><td>{{ m.lote.numero_lote }}</td><td class="text-end">{{ m.cantidad }}</td><td>{{ m.usuario }}</td></tr>
+        {% empty %}<tr><td colspan="5" class="text-muted">Sin movimientos todavía.</td></tr>{% endfor %}</tbody>
+      </table></div></div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card shadow-sm"><div class="card-header bg-white fw-semibold">Lotes por vencer</div>
+      <ul class="list-group list-group-flush">{% for a in proximas %}
+        <li class="list-group-item d-flex justify-content-between"><span>{{ a.lote.producto }}<br><small class="text-muted">Lote {{ a.lote.numero_lote }} · {{ a.cajas }} cajas</small></span>
+          <span class="badge {% if a.dias_restantes < 0 %}bg-danger{% elif a.dias_restantes <= 7 %}bg-warning text-dark{% else %}bg-info text-dark{% endif %} align-self-center">{% if a.dias_restantes < 0 %}Vencido{% else %}{{ a.dias_restantes }} días{% endif %}</span></li>
+      {% empty %}<li class="list-group-item text-muted">No hay alertas abiertas.</li>{% endfor %}</ul></div>
+  </div>
+</div>
+{% endblock %}

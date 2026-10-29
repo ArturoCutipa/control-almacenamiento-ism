@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block titulo %}Mapa del almacén{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-2"><i class="bi bi-map"></i> Mapa del almacén</h1>
+<p class="text-muted">Ocupación por zona, nivel y posición. Ubique adelante los productos de mayor rotación.
+  <span class="badge ocup-0 text-dark border">Vacía</span> <span class="badge ocup-1 text-dark">&lt; 60%</span>
+  <span class="badge ocup-2 text-dark">60-89%</span> <span class="badge ocup-3 text-dark">≥ 90%</span></p>
+<div class="row g-3">{% for zona, niveles in zonas.items %}
+  <div class="col-lg-6"><div class="card shadow-sm"><div class="card-header bg-white fw-semibold">Zona {{ zona }}</div><div class="card-body overflow-auto">
+    {% for nivel, ubicaciones in niveles.items %}
+    <div class="d-flex align-items-center gap-1 mb-1"><span class="small text-muted" style="width:3.5rem">Nivel {{ nivel }}</span>
+      {% for u in ubicaciones %}{% with p=u.porcentaje_ocupacion %}
+        <a href="{% url 'inventario:consulta' %}?q={{ u.codigo_qr }}" class="celda-mapa text-decoration-none text-dark {% if p == 0 %}ocup-0{% elif p < 60 %}ocup-1{% elif p < 90 %}ocup-2{% else %}ocup-3{% endif %}"
+           title="{{ u.codigo_qr }}: {{ u.pallets_ocupados }} de {{ u.capacidad_pallets }} pallets"><strong>{{ u.posicion }}</strong><span>{{ p }}%</span></a>
+      {% endwith %}{% endfor %}</div>
+    {% endfor %}
+  </div></div></div>
+{% empty %}<div class="col-12"><div class="alert alert-info">No hay ubicaciones activas.</div></div>{% endfor %}</div>
+{% endblock %}

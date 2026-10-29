@@ -1,0 +1,22 @@
+﻿services:
+  db:
+    image: postgres:17
+    container_name: ism-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ism_almacen}
+      POSTGRES_USER: ${POSTGRES_USER:-ism}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ism_dev_2026}
+      TZ: America/Lima
+    ports:
+      - "${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - ism_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ism} -d ${POSTGRES_DB:-ism_almacen}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ism_pgdata:

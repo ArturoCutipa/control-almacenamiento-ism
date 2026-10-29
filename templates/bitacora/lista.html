@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block titulo %}Bitácora{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-1"><i class="bi bi-journal-text"></i> Bitácora de operaciones</h1>
+<p class="text-muted">Registro de solo lectura: no se puede editar ni eliminar (RN-14).</p>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-6 col-md-2"><input type="date" name="desde" value="{{ filtros.desde }}" class="form-control" aria-label="Desde"></div>
+  <div class="col-6 col-md-2"><input type="date" name="hasta" value="{{ filtros.hasta }}" class="form-control" aria-label="Hasta"></div>
+  <div class="col-6 col-md-3"><select name="usuario" class="form-select" aria-label="Usuario"><option value="">Todos los usuarios</option>{% for u in usuarios %}<option value="{{ u.pk }}" {% if filtros.usuario == u.pk|stringformat:'s' %}selected{% endif %}>{{ u }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-md-3"><select name="accion" class="form-select" aria-label="Acción"><option value="">Todas las acciones</option>{% for a in acciones %}<option {% if filtros.accion == a %}selected{% endif %}>{{ a }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><button class="btn btn-ism w-100">Filtrar</button></div>
+</form>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-sm tabla-compacta mb-0">
+  <thead><tr><th>Fecha y hora</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead>
+  <tbody>{% for r in pagina %}<tr><td class="text-nowrap">{{ r.fecha_hora|date:"d/m/Y H:i:s" }}</td><td>{{ r.usuario|default:"Sistema" }}</td><td><span class="badge bg-light text-dark border">{{ r.accion }}</span></td><td class="small">{{ r.detalle }}</td></tr>
+  {% empty %}<tr><td colspan="4" class="text-muted">Sin registros.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% include "partials/paginacion.html" %}
+{% endblock %}

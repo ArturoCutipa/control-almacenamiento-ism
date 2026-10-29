@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block titulo %}Confirmar salida{% endblock %}
+{% block contenido %}
+<h1 class="h4 mb-3"><i class="bi bi-box-arrow-right"></i> Salida de {{ cantidad }} cajas · {{ producto }}</h1>
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card border-success shadow-sm"><div class="card-body">
+      <span class="badge bg-success mb-2">Lote sugerido (FEFO)</span>
+      <h2 class="h3 mb-1">{{ sugerido.lote.numero_lote }}</h2>
+      <p class="mb-1">Vence el <strong>{{ sugerido.lote.fecha_vencimiento|date:"d/m/Y" }}</strong></p>
+      <p class="mb-0">Ubicación <span class="badge bg-dark fs-6">{{ sugerido.ubicacion.codigo_qr }}</span> · {{ sugerido.cantidad_cajas }} cajas</p>
+      {% if sugerido.cantidad_cajas < cantidad %}<div class="alert alert-warning mt-3 mb-0">Ninguna ubicación tiene las {{ cantidad }} cajas: despache en partes.</div>{% endif %}
+    </div></div>
+    <form method="post" class="card shadow-sm mt-3"><div class="card-body">{% csrf_token %}
+      {% include "partials/campos.html" %}
+      <div id="avisoMotivo" class="alert alert-warning d-none">Eligió un lote distinto al sugerido: indique el motivo (RN-09).</div>
+      <button class="btn btn-ism btn-lg w-100"><i class="bi bi-check2-circle"></i> Confirmar salida</button>
+      <a class="btn btn-link w-100" href="{% url 'movimientos:salida' %}">Cancelar</a>
+    </div></form>
+  </div>
+  <div class="col-lg-7">
+    <div class="card shadow-sm"><div class="card-header bg-white fw-semibold">Stock disponible en orden FEFO</div>
+      <div class="table-responsive"><table class="table table-hover tabla-compacta mb-0">
+        <thead><tr><th></th><th>Lote</th><th>Vence</th><th>Ubicación</th><th class="text-end">Cajas</th></tr></thead>
+        <tbody>{% for s in candidatos %}
+          <tr><td><input class="form-check-input elegir-stock" type="radio" name="elegir" value="{{ s.pk }}"
+                 data-sugerido="{% if s.pk == sugerido.pk %}1{% endif %}" data-vence="{{ s.lote.fecha_vencimiento|date:'Y-m-d' }}"
+                 {% if s.pk == seleccionado %}checked{% endif %} aria-label="Elegir lote {{ s.lote.numero_lote }}"></td>
+            <td>{{ s.lote.numero_lote }}{% if s.pk == sugerido.pk %} <span class="badge bg-success">sugerido</span>{% endif %}</td>
+            <td>{{ s.lote.fecha_vencimiento|date:"d/m/Y" }}</td><td>{{ s.ubicacion.codigo_qr }}</td><td class="text-end">{{ s.cantidad_cajas }}</td></tr>
+        {% endfor %}</tbody>
+      </table></div></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function () {
+    const campo = document.querySelector("input[name=stock]");
+    const aviso = document.getElementById("avisoMotivo");
+    const venceSugerido = "{{ sugerido.lote.fecha_vencimiento|date:'Y-m-d' }}";
+    function actualizar(radio) {
+      campo.value = radio.value;
+      aviso.classList.toggle("d-none", radio.dataset.vence <= venceSugerido);
+    }
+    document.querySelectorAll(".elegir-stock").forEach(function (r) {
+      r.addEventListener("change", function () { actualizar(r); });
+      if (r.checked) actualizar(r);
+    });
+  })();
+</script>
+{% endblock %}

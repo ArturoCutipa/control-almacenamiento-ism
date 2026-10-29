@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}Transferencia interna{% endblock %}
+{% block contenido %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm"><div class="card-body p-4">
+      <h1 class="h4"><i class="bi bi-arrow-left-right"></i> Transferencia interna</h1>
+      <p class="text-muted">Mueva un lote entre ubicaciones escaneando el QR de origen y de destino.</p>
+      <form method="post">{% csrf_token %}{% include "partials/campos.html" %}
+        <button class="btn btn-ism btn-lg w-100"><i class="bi bi-check2-circle"></i> Registrar transferencia</button>
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

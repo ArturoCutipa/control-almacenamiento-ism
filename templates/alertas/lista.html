@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titulo %}Alertas de vencimiento{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h1 class="h3 mb-0"><i class="bi bi-bell"></i> Alertas de vencimiento</h1>
+  <div class="d-flex gap-2">
+    <div class="btn-group" role="group" aria-label="Filtro">
+      <a class="btn btn-{% if ver != 'atendidas' %}ism{% else %}outline-secondary{% endif %}" href="?ver=abiertas">Abiertas</a>
+      <a class="btn btn-{% if ver == 'atendidas' %}ism{% else %}outline-secondary{% endif %}" href="?ver=atendidas">Atendidas</a>
+    </div>
+    {% if ES_ENCARGADO %}<form method="post" action="{% url 'alertas:generar' %}">{% csrf_token %}<button class="btn btn-outline-primary"><i class="bi bi-arrow-repeat"></i> Revisar ahora</button></form>{% endif %}
+  </div>
+</div>
+<p class="text-muted">Se alerta cuando a un lote con stock le quedan 30 días o menos; los lotes vencidos se bloquean para despacho (RN-11, RN-12).</p>
+<div class="row g-3">{% for a in alertas %}
+  <div class="col-md-6 col-xl-4"><div class="card shadow-sm h-100 border-{% if a.tipo == 'VENCIDO' %}danger{% elif a.dias_restantes <= 7 %}warning{% else %}info{% endif %}"><div class="card-body">
+    <div class="d-flex justify-content-between"><span class="badge {% if a.tipo == 'VENCIDO' %}bg-danger{% elif a.dias_restantes <= 7 %}bg-warning text-dark{% else %}bg-info text-dark{% endif %}">{% if a.tipo == 'VENCIDO' %}Vencido · bloqueado{% else %}{{ a.dias_restantes }} días{% endif %}</span><small class="text-muted">{{ a.fecha|date:"d/m/Y" }}</small></div>
+    <h2 class="h6 mt-2 mb-1">{{ a.lote.producto }}</h2>
+    <p class="mb-1">Lote <a href="{% url 'inventario:lote' a.lote_id %}">{{ a.lote.numero_lote }}</a> · vence {{ a.lote.fecha_vencimiento|date:"d/m/Y" }} · {{ a.cajas }} cajas</p>
+    <p class="small mb-2">Ubicaciones: {% for s in a.lote.stocks.all %}{% if s.cantidad_cajas %}<span class="badge bg-light text-dark border">{{ s.ubicacion.codigo_qr }} ({{ s.cantidad_cajas }})</span> {% endif %}{% endfor %}</p>
+    {% if not a.atendida and ES_PLANIFICACION %}
+    <form method="post" action="{% url 'alertas:atender' a.pk %}" class="d-flex gap-2">{% csrf_token %}
+      <input name="comentario" class="form-control form-control-sm" placeholder="Acción tomada (despacho, activación comercial...)" aria-label="Comentario">
+      <button class="btn btn-sm btn-ism text-nowrap">Atendida</button></form>
+    {% elif a.atendida %}<p class="small text-muted mb-0">Atendida por {{ a.atendida_por|default:"sistema" }}: {{ a.comentario }}</p>{% endif %}
+  </div></div></div>
+{% empty %}<div class="col-12"><div class="alert alert-success">No hay alertas {% if ver == 'atendidas' %}atendidas{% else %}abiertas{% endif %}.</div></div>{% endfor %}
+</div>
+{% endblock %}

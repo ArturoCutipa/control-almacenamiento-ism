@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block titulo %}{{ conteo }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h1 class="h3 mb-0"><i class="bi bi-clipboard-check"></i> {{ conteo }} {% if conteo.descripcion %}<small class="text-muted">· {{ conteo.descripcion }}</small>{% endif %}</h1>
+  <div class="d-flex gap-2">
+    {% if conteo.estado == 'ABIERTO' and ES_ENCARGADO %}
+    <form method="post" action="{% url 'conteos:cerrar' conteo.pk %}">{% csrf_token %}<button class="btn btn-outline-success"><i class="bi bi-lock"></i> Cerrar conteo</button></form>
+    {% endif %}
+    <a class="btn btn-outline-secondary" href="{% url 'conteos:lista' %}"><i class="bi bi-arrow-left"></i> Volver</a>
+  </div>
+</div>
+<div class="row g-3">
+  {% if conteo.estado == 'ABIERTO' %}
+  <div class="col-lg-4"><div class="card shadow-sm"><div class="card-body">
+    <h2 class="h5">Registrar lo contado</h2>
+    <form method="post">{% csrf_token %}{% include "partials/campos.html" %}
+      <button class="btn btn-ism btn-lg w-100"><i class="bi bi-check2-circle"></i> Registrar conteo</button></form>
+  </div></div></div>
+  {% endif %}
+  <div class="{% if conteo.estado == 'ABIERTO' %}col-lg-8{% else %}col-12{% endif %}">
+    <div class="card shadow-sm"><div class="card-header bg-white fw-semibold">Resultado y conciliación</div>
+      <div class="table-responsive"><table class="table tabla-compacta mb-0">
+        <thead><tr><th>Ubicación</th><th>Lote</th><th class="text-end">Sistema</th><th class="text-end">Contado</th><th class="text-end">Dif.</th><th>Estado</th></tr></thead>
+        <tbody>{% for d in detalles %}
+          <tr><td>{{ d.ubicacion.codigo_qr }}</td><td>{{ d.lote.numero_lote }}<br><small class="text-muted">{{ d.lote.producto }}</small></td>
+            <td class="text-end">{{ d.cant_sistema }}</td><td class="text-end">{{ d.cant_fisica }}</td>
+            <td class="text-end fw-bold {% if d.diferencia < 0 %}text-danger{% elif d.diferencia > 0 %}text-primary{% endif %}">{% if d.diferencia > 0 %}+{% endif %}{{ d.diferencia }}</td>
+            <td>{% if d.estado == 'PENDIENTE' %}
+                  {% if ES_ENCARGADO %}
+                  <form method="post" action="{% url 'conteos:revisar' d.pk %}" class="d-flex flex-column gap-1">{% csrf_token %}
+                    <input name="motivo" class="form-control form-control-sm" placeholder="Motivo (obligatorio para aprobar)" aria-label="Motivo">
+                    <div class="d-flex gap-1"><button name="accion" value="aprobar" class="btn btn-success btn-sm">Aprobar ajuste</button>
+                    <button name="accion" value="rechazar" class="btn btn-outline-danger btn-sm">Reconteo</button></div></form>
+                  {% else %}<span class="badge bg-warning text-dark">Pendiente de aprobación</span>{% endif %}
+                {% else %}<span class="badge {% if d.estado == 'APROBADO' %}bg-success{% elif d.estado == 'RECHAZADO' %}bg-danger{% else %}bg-secondary{% endif %}">{{ d.get_estado_display }}</span>
+                  {% if d.motivo %}<div class="small text-muted">{{ d.motivo }}{% if d.revisado_por %} · {{ d.revisado_por }}{% endif %}</div>{% endif %}{% endif %}</td></tr>
+        {% empty %}<tr><td colspan="6" class="text-muted">Aún no se registraron conteos.</td></tr>{% endfor %}</tbody>
+      </table></div></div>
+  </div>
+</div>
+{% endblock %}

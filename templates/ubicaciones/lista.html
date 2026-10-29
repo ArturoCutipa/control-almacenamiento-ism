@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titulo %}Ubicaciones{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h1 class="h3 mb-0"><i class="bi bi-qr-code"></i> Ubicaciones</h1>
+  {% if ES_ENCARGADO %}<a class="btn btn-ism" href="{% url 'ubicaciones:nueva' %}"><i class="bi bi-plus-lg"></i> Nueva ubicación</a>{% endif %}
+</div>
+<form method="get" class="d-flex gap-2 mb-3">
+  <select name="zona" class="form-select w-auto" aria-label="Zona"><option value="">Todas las zonas</option>{% for z in zonas %}<option {% if z == zona %}selected{% endif %}>{{ z }}</option>{% endfor %}</select>
+  <button class="btn btn-outline-secondary">Filtrar</button>
+</form>
+<form method="get" action="{% url 'ubicaciones:etiquetas' %}" target="_blank">
+  <div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover tabla-compacta mb-0">
+    <thead><tr>{% if ES_ENCARGADO %}<th><input type="checkbox" class="form-check-input" id="todos" aria-label="Seleccionar todas"></th>{% endif %}<th>Código QR</th><th>Zona</th><th>Nivel</th><th>Posición</th><th>Ocupación</th><th>Estado</th><th></th></tr></thead>
+    <tbody>{% for u in ubicaciones %}
+      <tr>{% if ES_ENCARGADO %}<td><input type="checkbox" class="form-check-input sel" name="id" value="{{ u.pk }}" aria-label="Seleccionar {{ u.codigo_qr }}"></td>{% endif %}
+        <td class="fw-semibold">{{ u.codigo_qr }}</td><td>{{ u.zona }}</td><td>{{ u.nivel }}</td><td>{{ u.posicion }}</td>
+        <td style="min-width:9rem"><div class="progress" role="progressbar" aria-valuenow="{{ u.porcentaje_ocupacion }}" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar {% if u.porcentaje_ocupacion >= 90 %}bg-danger{% elif u.porcentaje_ocupacion >= 60 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ u.porcentaje_ocupacion }}%"></div></div><small>{{ u.pallets_ocupados }} / {{ u.capacidad_pallets }} pallets</small></td>
+        <td>{% if u.activa %}<span class="badge bg-success">Activa</span>{% else %}<span class="badge bg-secondary">Inactiva</span>{% endif %}</td>
+        <td>{% if ES_ENCARGADO %}<a class="btn btn-sm btn-outline-secondary" href="{% url 'ubicaciones:editar' u.pk %}"><i class="bi bi-pencil"></i></a>{% endif %}</td></tr>
+    {% empty %}<tr><td colspan="8" class="text-muted">No hay ubicaciones registradas.</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% if ES_ENCARGADO %}<div class="card-footer bg-white d-flex gap-2 flex-wrap">
+    <button class="btn btn-outline-dark"><i class="bi bi-printer"></i> Imprimir etiquetas QR seleccionadas</button>
+    {% if zona %}<a class="btn btn-outline-dark" target="_blank" href="{% url 'ubicaciones:etiquetas' %}?zona={{ zona }}">Toda la zona {{ zona }}</a>{% endif %}
+  </div>{% endif %}</div>
+</form>
+{% endblock %}
+{% block scripts %}<script>
+  const t = document.getElementById("todos");
+  if (t) t.addEventListener("change", () => document.querySelectorAll(".sel").forEach(c => c.checked = t.checked));
+</script>{% endblock %}

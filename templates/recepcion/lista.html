@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block titulo %}Recepción{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3"><i class="bi bi-truck"></i> Recepción de mercadería</h1>
+<div class="row g-3">
+  <div class="col-md-5">
+    <div class="card shadow-sm"><div class="card-body">
+      <h2 class="h5">Nueva recepción</h2>
+      <p class="text-muted small">Ingrese la guía de remisión del camión que llegó de la planta.</p>
+      <form method="post">{% csrf_token %}{% include "partials/campos.html" %}
+        <button class="btn btn-ism btn-lg w-100"><i class="bi bi-play-circle"></i> Iniciar recepción</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-md-7">
+    <div class="card shadow-sm"><div class="card-header bg-white fw-semibold">Recepciones recientes</div>
+      <div class="table-responsive"><table class="table table-hover tabla-compacta mb-0">
+        <thead><tr><th>Guía</th><th>Inicio</th><th>Operario</th><th class="text-end">Pallets</th><th>Estado</th></tr></thead>
+        <tbody>{% for r in recepciones %}
+          <tr onclick="location.href='{% url 'recepcion:detalle' r.pk %}'" style="cursor:pointer">
+            <td><a href="{% url 'recepcion:detalle' r.pk %}">{{ r.guia_remision }}</a></td>
+            <td>{{ r.fecha_hora_inicio|date:"d/m/Y H:i" }}</td><td>{{ r.usuario }}</td>
+            <td class="text-end">{{ r.detalles.all|length }}</td>
+            <td>{% if r.finalizada %}<span class="badge bg-success">Finalizada · {{ r.duracion_min }} min</span>{% else %}<span class="badge bg-warning text-dark">En curso</span>{% endif %}</td>
+          </tr>
+        {% empty %}<tr><td colspan="5" class="text-muted">Aún no hay recepciones.</td></tr>{% endfor %}</tbody>
+      </table></div></div>
+  </div>
+</div>
+{% endblock %}

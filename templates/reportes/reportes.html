@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Reportes{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3"><i class="bi bi-bar-chart"></i> Reportes e indicadores</h1>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-4"><select name="tipo" class="form-select" aria-label="Reporte">{% for k, v in tipos.items %}<option value="{{ k }}" {% if datos.tipo == k %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-md-2"><input type="date" name="desde" value="{{ datos.desde|date:'Y-m-d' }}" class="form-control" aria-label="Desde"></div>
+  <div class="col-6 col-md-2"><input type="date" name="hasta" value="{{ datos.hasta|date:'Y-m-d' }}" class="form-control" aria-label="Hasta"></div>
+  <div class="col-md-4 d-flex gap-2">
+    <button class="btn btn-ism flex-fill"><i class="bi bi-eye"></i> Ver</button>
+    <button class="btn btn-outline-danger" name="formato" value="pdf"><i class="bi bi-filetype-pdf"></i> PDF</button>
+    <button class="btn btn-outline-success" name="formato" value="xlsx"><i class="bi bi-file-earmark-excel"></i> Excel</button>
+  </div>
+</form>
+<h2 class="h5">{{ datos.titulo }} <small class="text-muted">del {{ datos.desde|date:"d/m/Y" }} al {{ datos.hasta|date:"d/m/Y" }}</small></h2>
+<div class="row g-3 mb-3">{% for k, v in datos.resumen %}<div class="col-6 col-md-3"><div class="card card-body indicador shadow-sm"><span class="text-muted small">{{ k }}</span><span class="valor">{{ v }}</span></div></div>{% endfor %}</div>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-sm tabla-compacta mb-0">
+  <thead><tr>{% for c in datos.columnas %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+  <tbody>{% for f in datos.filas %}<tr>{% for v in f %}<td>{{ v }}</td>{% endfor %}</tr>
+  {% empty %}<tr><td colspan="{{ datos.columnas|length }}" class="text-muted">Sin datos en el rango.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

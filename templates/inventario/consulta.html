@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block titulo %}Consulta de stock{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3"><i class="bi bi-search"></i> Consulta de stock y ubicación</h1>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-9"><input name="q" value="{{ q }}" class="form-control form-control-lg" data-escaner="barras" placeholder="Código de barras, lote, marca, sabor o QR de ubicación" aria-label="Buscar"></div>
+  <div class="col-md-3"><button class="btn btn-ism btn-lg w-100"><i class="bi bi-search"></i> Buscar</button></div>
+</form>
+<p class="text-muted">{{ stocks|length }} registro(s) · {{ total|intcomma }} cajas</p>
+<div class="card shadow-sm"><div class="table-responsive"><table class="table table-hover tabla-compacta mb-0">
+  <thead><tr><th>Producto</th><th>Código</th><th>Lote</th><th>Vence</th><th>Estado</th><th>Ubicación</th><th class="text-end">Cajas</th></tr></thead>
+  <tbody>{% for s in stocks %}
+    <tr><td>{{ s.lote.producto }}</td><td><small>{{ s.lote.producto.codigo_barras }}</small></td>
+      <td><a href="{% url 'inventario:lote' s.lote_id %}">{{ s.lote.numero_lote }}</a></td>
+      <td>{{ s.lote.fecha_vencimiento|date:"d/m/Y" }}</td>
+      <td><span class="badge {% if s.lote.estado == 'DISPONIBLE' %}bg-success{% else %}bg-danger{% endif %}">{{ s.lote.get_estado_display }}</span></td>
+      <td><span class="badge bg-dark">{{ s.ubicacion.codigo_qr }}</span></td><td class="text-end">{{ s.cantidad_cajas|intcomma }}</td></tr>
+  {% empty %}<tr><td colspan="7" class="text-muted">No se encontró stock.</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

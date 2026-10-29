@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block titulo %}Guía {{ recepcion.guia_remision }}{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h1 class="h3 mb-0"><i class="bi bi-truck"></i> Guía {{ recepcion.guia_remision }}</h1>
+  <a class="btn btn-outline-secondary" href="{% url 'recepcion:lista' %}"><i class="bi bi-arrow-left"></i> Volver</a>
+</div>
+<div class="row g-3">
+  {% if not recepcion.finalizada %}
+  <div class="col-lg-5">
+    <div class="card shadow-sm"><div class="card-body">
+      <h2 class="h5">Registrar pallet</h2>
+      <p class="text-muted small mb-3">1) Escanee el código de barras · 2) Ingrese lote, vencimiento y cajas · 3) Ubique el pallet con el QR del estante.</p>
+      <form method="post">{% csrf_token %}{% include "partials/campos.html" %}
+        <button class="btn btn-ism btn-lg w-100"><i class="bi bi-check2-circle"></i> Registrar y ubicar</button>
+      </form>
+    </div></div>
+  </div>
+  {% endif %}
+  <div class="{% if recepcion.finalizada %}col-12{% else %}col-lg-7{% endif %}">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Pallets registrados ({{ detalles|length }})</span>
+        <span class="small text-muted">Inicio {{ recepcion.fecha_hora_inicio|date:"d/m/Y H:i" }}{% if recepcion.finalizada %} · Fin {{ recepcion.fecha_hora_fin|date:"H:i" }} · {{ recepcion.duracion_min }} min{% endif %}</span>
+      </div>
+      <div class="table-responsive"><table class="table tabla-compacta mb-0">
+        <thead><tr><th>Producto</th><th>Lote</th><th>Vence</th><th class="text-end">Cajas</th><th class="text-end">Pallets</th><th>Ubicación</th></tr></thead>
+        <tbody>{% for d in detalles %}
+          <tr><td>{{ d.lote.producto }}</td><td>{{ d.lote.numero_lote }}</td><td>{{ d.lote.fecha_vencimiento|date:"d/m/Y" }}</td>
+            <td class="text-end">{{ d.cantidad_cajas }}</td><td class="text-end">{{ d.pallets }}</td>
+            <td>{% if d.ubicado %}<span class="badge bg-success">{{ d.ubicacion.codigo_qr }}</span>{% else %}<a class="btn btn-warning btn-sm" href="{% url 'recepcion:ubicar' d.pk %}"><i class="bi bi-qr-code-scan"></i> Ubicar</a>{% endif %}</td></tr>
+        {% empty %}<tr><td colspan="6" class="text-muted">Todavía no hay pallets registrados.</td></tr>{% endfor %}</tbody>
+      </table></div>
+      {% if not recepcion.finalizada %}
+      <div class="card-footer bg-white text-end">
+        <form method="post" action="{% url 'recepcion:finalizar' recepcion.pk %}" class="d-inline">{% csrf_token %}
+          <button class="btn btn-outline-success btn-lg"><i class="bi bi-flag"></i> Finalizar recepción</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

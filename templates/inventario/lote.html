@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}Lote {{ lote.numero_lote }}{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3"><i class="bi bi-tag"></i> Lote {{ lote.numero_lote }}</h1>
+<div class="row g-3">
+  <div class="col-md-4"><div class="card card-body shadow-sm">
+    <dl class="mb-0"><dt>Producto</dt><dd>{{ lote.producto }} <small class="text-muted">({{ lote.producto.codigo_barras }})</small></dd>
+      <dt>Vencimiento</dt><dd>{{ lote.fecha_vencimiento|date:"d/m/Y" }} · {{ lote.dias_para_vencer }} días</dd>
+      <dt>Estado</dt><dd><span class="badge {% if lote.estado == 'DISPONIBLE' %}bg-success{% else %}bg-danger{% endif %}">{{ lote.get_estado_display }}</span></dd>
+      <dt>Stock total</dt><dd>{{ lote.total_cajas }} cajas</dd></dl>
+    <h2 class="h6 mt-3">Ubicaciones</h2>
+    <ul class="list-group">{% for s in stocks %}<li class="list-group-item d-flex justify-content-between"><span>{{ s.ubicacion.codigo_qr }}</span><span>{{ s.cantidad_cajas }} cajas</span></li>{% empty %}<li class="list-group-item text-muted">Sin stock.</li>{% endfor %}</ul>
+  </div></div>
+  <div class="col-md-8"><div class="card shadow-sm"><div class="card-header bg-white fw-semibold">Trazabilidad del lote</div>
+    <div class="table-responsive"><table class="table table-sm tabla-compacta mb-0">
+      <thead><tr><th>Fecha</th><th>Tipo</th><th class="text-end">Cajas</th><th>Origen</th><th>Destino</th><th>Usuario</th><th>Motivo</th></tr></thead>
+      <tbody>{% for m in movimientos %}<tr><td>{{ m.fecha_hora|date:"d/m/Y H:i" }}</td><td>{{ m.get_tipo_display }}</td><td class="text-end">{{ m.cantidad }}</td><td>{{ m.ubicacion_origen|default:"" }}</td><td>{{ m.ubicacion_destino|default:"" }}</td><td>{{ m.usuario }}</td><td class="small">{{ m.motivo }}</td></tr>
+      {% empty %}<tr><td colspan="7" class="text-muted">Sin movimientos.</td></tr>{% endfor %}</tbody>
+    </table></div></div></div>
+</div>
+{% endblock %}

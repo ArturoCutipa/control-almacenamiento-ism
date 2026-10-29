@@ -1,0 +1,25 @@
+:root {
+  --ism-verde: #00953b;
+  --ism-verde-oscuro: #006f2c;
+  --ism-rojo: #e1251b;
+}
+body { background: #f4f6f8; }
+.barra-ism { background: var(--ism-verde-oscuro); }
+.btn-ism { background: var(--ism-verde); border-color: var(--ism-verde); color: #fff; }
+.btn-ism:hover, .btn-ism:focus { background: var(--ism-verde-oscuro); border-color: var(--ism-verde-oscuro); color: #fff; }
+/* Botones y campos amplios para uso en tablet (RNF-01) */
+.btn-lg, .form-control-lg, .form-select-lg { min-height: 3.2rem; }
+.tarjeta-accion { display: block; text-decoration: none; color: inherit; border-radius: .75rem; transition: transform .1s; }
+.tarjeta-accion:hover { transform: translateY(-2px); }
+.tarjeta-accion .bi { font-size: 2.2rem; color: var(--ism-verde); }
+.indicador .valor { font-size: 2rem; font-weight: 700; }
+.celda-mapa { width: 4.2rem; height: 3.2rem; border-radius: .4rem; font-size: .75rem; display: flex;
+  flex-direction: column; align-items: center; justify-content: center; border: 1px solid #ccc; }
+.ocup-0 { background: #fff; }
+.ocup-1 { background: #d1f2dc; }
+.ocup-2 { background: #fde9a6; }
+.ocup-3 { background: #f8b4ae; }
+.tabla-compacta td, .tabla-compacta th { padding: .35rem .5rem; vertical-align: middle; }
+#lectorCamara { width: 100%; }
+.campo-escaner .btn { min-width: 3.4rem; }
+@media (max-width: 576px) { .indicador .valor { font-size: 1.5rem; } }
