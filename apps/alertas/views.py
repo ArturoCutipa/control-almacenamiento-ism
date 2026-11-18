@@ -10,6 +10,7 @@ from .models import Alerta
 
 @rol_requerido(*TODOS)
 def lista(request):
+    services.generar_alertas_del_dia()
     ver = request.GET.get("ver", "abiertas")
     alertas = Alerta.objects.select_related("lote__producto", "atendida_por").prefetch_related("lote__stocks__ubicacion")
     alertas = alertas.filter(atendida=(ver == "atendidas"))

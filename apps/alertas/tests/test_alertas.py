@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from apps import pruebas
 from apps.alertas.models import Alerta
-from apps.alertas.services import generar_alertas
+from apps.alertas.services import generar_alertas, generar_alertas_del_dia
 from apps.inventario.models import Lote
 
 
@@ -18,6 +18,11 @@ class AlertasTests(TestCase):
         self.assertEqual(r["nuevas"], 1)
         self.assertTrue(Alerta.objects.filter(lote=self.proximo, tipo=Alerta.POR_VENCER).exists())
         self.assertFalse(Alerta.objects.filter(lote=self.lejano).exists())
+
+    def test_rf12_revision_diaria_automatica_una_vez_por_dia(self):
+        self.assertIsNotNone(generar_alertas_del_dia())
+        self.assertTrue(Alerta.objects.filter(lote=self.proximo, tipo=Alerta.POR_VENCER).exists())
+        self.assertIsNone(generar_alertas_del_dia())  # ya se ejecutó hoy
 
     def test_proceso_es_idempotente(self):
         generar_alertas()

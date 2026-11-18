@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.utils import timezone
 
 from apps.alertas.models import Alerta
+from apps.alertas.services import generar_alertas_del_dia
 from apps.conteos.models import DetalleConteo
 from apps.inventario.models import Stock
 from apps.movimientos.models import Movimiento
@@ -15,6 +16,7 @@ from apps.usuarios.permisos import TODOS, rol_requerido
 def panel(request):
     """Panel con las funciones e indicadores del rol (RF-20)."""
     hoy = timezone.localdate()
+    generar_alertas_del_dia(hoy)
     ubicaciones = list(Ubicacion.objects.filter(activa=True).prefetch_related("stocks__lote__producto"))
     capacidad = sum(u.capacidad_pallets for u in ubicaciones)
     ocupados = sum(u.pallets_ocupados() for u in ubicaciones)

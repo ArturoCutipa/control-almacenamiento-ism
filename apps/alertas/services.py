@@ -6,6 +6,7 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
+from apps.bitacora.models import Bitacora
 from apps.bitacora.services import registrar
 from apps.inventario.models import Lote
 
@@ -38,6 +39,17 @@ def generar_alertas(hoy=None, plazo=None):
         creadas += int(nueva)
     registrar(None, "GENERAR_ALERTAS", f"{creadas} alertas nuevas, {vencidos} lotes vencidos bloqueados")
     return {"nuevas": creadas, "vencidos": vencidos, "revisados": len(lotes)}
+
+
+def generar_alertas_del_dia(hoy=None):
+    """RF-12: asegura que la revisión diaria se ejecute aunque no se haya programado el cron.
+
+    Se llama al abrir el panel o la lista de alertas; solo procesa si hoy aún no hubo revisión.
+    """
+    hoy = hoy or timezone.localdate()
+    if Bitacora.objects.filter(accion="GENERAR_ALERTAS", fecha_hora__date=hoy).exists():
+        return None
+    return generar_alertas(hoy=hoy)
 
 
 def atender(alerta, usuario, comentario=""):
