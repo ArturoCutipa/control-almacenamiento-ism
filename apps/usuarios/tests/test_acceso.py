@@ -56,6 +56,15 @@ class AccesoPorRolTests(TestCase):
             with self.subTest(nombre=nombre):
                 self.assertEqual(self.client.get(reverse(nombre)).status_code, 200)
 
+    def test_filtros_invalidos_no_rompen_las_pantallas(self):
+        self.ingresar(Rol.ADMIN)
+        casos = [("movimientos:historial", {"desde": "malo", "hasta": "2026-13-40"}),
+                 ("bitacora:lista", {"desde": "xx", "hasta": "yy", "usuario": "abc"}),
+                 ("reportes:reportes", {"tipo": "movimientos", "desde": "x"})]
+        for nombre, params in casos:
+            with self.subTest(nombre=nombre):
+                self.assertEqual(self.client.get(reverse(nombre), params).status_code, 200)
+
     def test_reportes_en_pdf_y_excel(self):
         self.ingresar(Rol.ENCARGADO)
         for formato in ("pdf", "xlsx"):

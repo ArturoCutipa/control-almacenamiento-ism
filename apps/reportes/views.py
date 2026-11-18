@@ -1,20 +1,14 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.http import FileResponse, Http404
 from django.shortcuts import render
 from django.utils import timezone
 
 from apps.bitacora.services import registrar
+from apps.filtros import fecha_iso
 from apps.usuarios.permisos import ADMIN, ENCARGADO, PLANIFICACION, rol_requerido
 
 from . import services
-
-
-def _fecha(valor, defecto):
-    try:
-        return datetime.strptime(valor, "%Y-%m-%d").date()
-    except (TypeError, ValueError):
-        return defecto
 
 
 @rol_requerido(ENCARGADO, ADMIN, PLANIFICACION)
@@ -23,8 +17,8 @@ def reportes(request):
     tipo = request.GET.get("tipo", "movimientos")
     if tipo not in services.TIPOS:
         raise Http404
-    desde = _fecha(request.GET.get("desde"), hoy - timedelta(days=30))
-    hasta = _fecha(request.GET.get("hasta"), hoy)
+    desde = fecha_iso(request.GET.get("desde"), hoy - timedelta(days=30))
+    hasta = fecha_iso(request.GET.get("hasta"), hoy)
     datos = services.generar(tipo, desde, hasta)
     formato = request.GET.get("formato")
     if formato in ("pdf", "xlsx"):

@@ -1,9 +1,8 @@
-from datetime import datetime
-
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 
+from apps.filtros import fecha_iso
 from apps.inventario.excepciones import ReglaNegocioError
 from apps.inventario.models import Stock
 from apps.ubicaciones.models import Ubicacion
@@ -89,10 +88,11 @@ def historial(request):
     f = {k: request.GET.get(k, "").strip() for k in ("tipo", "desde", "hasta", "q")}
     if f["tipo"]:
         movs = movs.filter(tipo=f["tipo"])
-    if f["desde"]:
-        movs = movs.filter(fecha_hora__date__gte=datetime.strptime(f["desde"], "%Y-%m-%d").date())
-    if f["hasta"]:
-        movs = movs.filter(fecha_hora__date__lte=datetime.strptime(f["hasta"], "%Y-%m-%d").date())
+    desde, hasta = fecha_iso(f["desde"]), fecha_iso(f["hasta"])
+    if desde:
+        movs = movs.filter(fecha_hora__date__gte=desde)
+    if hasta:
+        movs = movs.filter(fecha_hora__date__lte=hasta)
     if f["q"]:
         movs = movs.filter(lote__numero_lote__icontains=f["q"]) | movs.filter(lote__producto__codigo_barras=f["q"])
     pagina = Paginator(movs, 50).get_page(request.GET.get("page"))
