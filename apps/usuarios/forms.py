@@ -56,12 +56,20 @@ class UsuarioForm(forms.ModelForm):
         p1, p2 = datos.get("password1"), datos.get("password2")
         if not self.instance.pk and not p1:
             self.add_error("password1", "Ingrese una contraseña para el nuevo usuario.")
-        if p1 or p2:
-            if p1 != p2:
-                self.add_error("password2", "Las contraseñas no coinciden.")
-            else:
-                validate_password(p1, self.instance)
+        if (p1 or p2) and p1 != p2:
+            self.add_error("password2", "Las contraseñas no coinciden.")
         return datos
+
+    def _post_clean(self):
+        # Se valida después de copiar los datos al usuario, para que el validador de similitud
+        # compare la contraseña con el usuario, nombres y correo que se están guardando.
+        super()._post_clean()
+        p1 = self.cleaned_data.get("password1")
+        if p1 and p1 == self.cleaned_data.get("password2"):
+            try:
+                validate_password(p1, self.instance)
+            except forms.ValidationError as error:
+                self.add_error("password1", error)
 
     def save(self, commit=True):
         usuario = super().save(commit=False)

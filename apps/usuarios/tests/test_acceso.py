@@ -126,3 +126,19 @@ class UsuarioFormTests(TestCase):
         datos = self.datos(username=otro.username, rol=self.rol_operario.pk, is_active=False)
         form = UsuarioForm(datos, instance=otro, editor=self.admin)
         self.assertTrue(form.is_valid(), form.errors)
+
+    def test_contrasena_igual_al_usuario_se_rechaza_al_crear(self):
+        datos = {"username": "jflores2026", "first_name": "Jorge", "last_name": "Flores", "email": "",
+                 "rol": self.rol_operario.pk, "is_active": True,
+                 "password1": "jflores2026", "password2": "jflores2026"}
+        form = UsuarioForm(datos, editor=self.admin)
+        self.assertFalse(form.is_valid())
+        self.assertIn("password1", form.errors)
+
+    def test_contrasena_segura_se_acepta_al_crear(self):
+        datos = {"username": "jflores", "first_name": "Jorge", "last_name": "Flores", "email": "",
+                 "rol": self.rol_operario.pk, "is_active": True,
+                 "password1": "Almacen#Tacna26", "password2": "Almacen#Tacna26"}
+        form = UsuarioForm(datos, editor=self.admin)
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertTrue(form.save().check_password("Almacen#Tacna26"))
