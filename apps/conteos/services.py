@@ -1,4 +1,4 @@
-"""Conteo físico (RF-15) y conciliación con ajustes aprobados (RF-16, RN-13)."""
+"""Conteo físico (RF-13) y conciliación con ajustes aprobados (RF-14, RN-13)."""
 from django.db import transaction
 from django.utils import timezone
 

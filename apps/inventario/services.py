@@ -11,7 +11,7 @@ from .models import Lote, Stock
 
 
 def obtener_o_crear_lote(producto, numero_lote, fecha_vencimiento, hoy=None):
-    """RF-08 / RN-04 / RN-05: crea el lote si no existe; valida la fecha de vencimiento."""
+    """RF-06 / RN-04 / RN-05: crea el lote si no existe; valida la fecha de vencimiento."""
     hoy = hoy or timezone.localdate()
     numero_lote = numero_lote.strip().upper()
     if not numero_lote:

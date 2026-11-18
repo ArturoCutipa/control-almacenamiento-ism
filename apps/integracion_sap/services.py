@@ -1,4 +1,4 @@
-"""Archivo Excel de carga para SAP con el inventario consolidado por producto y lote (RF-18)."""
+"""Archivo Excel de carga para SAP con el inventario consolidado por producto y lote (RF-15)."""
 from collections import defaultdict
 from datetime import datetime, time
 from io import BytesIO

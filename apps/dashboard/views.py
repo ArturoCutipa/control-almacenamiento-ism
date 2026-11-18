@@ -14,7 +14,7 @@ from apps.usuarios.permisos import TODOS, rol_requerido
 
 @rol_requerido(*TODOS)
 def panel(request):
-    """Panel con las funciones e indicadores del rol (RF-20)."""
+    """Panel con las funciones e indicadores del rol (RF-01)."""
     hoy = timezone.localdate()
     generar_alertas_del_dia(hoy)
     ubicaciones = list(Ubicacion.objects.filter(activa=True).prefetch_related("stocks__lote__producto"))

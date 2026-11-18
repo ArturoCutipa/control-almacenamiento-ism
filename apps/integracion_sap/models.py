@@ -3,7 +3,7 @@ from django.db import models
 
 
 class ExportacionSAP(models.Model):
-    """Archivo de carga generado para SAP (RF-18). El sistema no escribe en SAP (RN-15)."""
+    """Archivo de carga generado para SAP (RF-15). El sistema no escribe en SAP (RN-15)."""
 
     fecha_corte = models.DateField("fecha de corte")
     fecha_hora = models.DateTimeField(auto_now_add=True)

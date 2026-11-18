@@ -1,4 +1,4 @@
-"""Generación de etiquetas QR en PDF (RF-06) con qrcode 8.0 y ReportLab 4.4."""
+"""Generación de etiquetas QR en PDF (RF-05) con qrcode 8.0 y ReportLab 4.4."""
 from io import BytesIO
 
 import qrcode

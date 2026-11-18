@@ -8,7 +8,7 @@ from .models import Lote, Stock
 
 @rol_requerido(*TODOS)
 def consulta(request):
-    """Consulta de stock por producto, lote y ubicación (RF-12)."""
+    """Consulta de stock por producto, lote y ubicación (RF-10)."""
     q = request.GET.get("q", "").strip()
     stocks = (Stock.objects.filter(cantidad_cajas__gt=0)
               .select_related("lote__producto", "ubicacion")

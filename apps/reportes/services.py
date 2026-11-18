@@ -1,4 +1,4 @@
-"""Reportes e indicadores (RF-19). Cada reporte devuelve título, columnas, filas y resumen."""
+"""Reportes e indicadores (RF-16). Cada reporte devuelve título, columnas, filas y resumen."""
 from datetime import timedelta
 from io import BytesIO
 

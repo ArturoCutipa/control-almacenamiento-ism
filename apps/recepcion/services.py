@@ -1,4 +1,4 @@
-"""Recepción desde tablet (RF-07, RF-08) y asignación de ubicación por QR (RF-09)."""
+"""Recepción desde tablet (RF-06) y asignación de ubicación por QR (RF-07)."""
 import math
 
 from django.db import transaction

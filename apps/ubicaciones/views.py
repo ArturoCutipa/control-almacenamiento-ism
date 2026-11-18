@@ -55,7 +55,7 @@ def etiquetas(request):
 
 @rol_requerido(*TODOS)
 def mapa(request):
-    """Mapa de ocupación por zona, nivel y posición (RF-13)."""
+    """Mapa de ocupación por zona, nivel y posición (RF-11)."""
     zonas = OrderedDict()
     for u in Ubicacion.objects.filter(activa=True).prefetch_related("stocks__lote__producto"):
         niveles = zonas.setdefault(u.zona, OrderedDict())

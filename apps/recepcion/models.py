@@ -6,7 +6,7 @@ from apps.ubicaciones.models import Ubicacion
 
 
 class Recepcion(models.Model):
-    """Recepción de un camión identificada por su guía de remisión (RF-07)."""
+    """Recepción de un camión identificada por su guía de remisión (RF-06)."""
 
     guia_remision = models.CharField("guía de remisión", max_length=30)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="recepciones")

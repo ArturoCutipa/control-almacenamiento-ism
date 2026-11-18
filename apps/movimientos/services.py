@@ -1,4 +1,4 @@
-"""Salidas con rotación FEFO/FIFO (RF-10) y transferencias internas (RF-11)."""
+"""Salidas con rotación FEFO/FIFO (RF-08) y transferencias internas (RF-09)."""
 from django.db import transaction
 from django.utils import timezone
 
@@ -30,7 +30,7 @@ def sugerir(producto, cantidad, hoy=None):
 
 @transaction.atomic
 def registrar_salida(*, stock, cantidad, usuario, motivo="", hoy=None):
-    """RF-10 / RN-09: si no se despacha el lote sugerido por FEFO, el motivo es obligatorio."""
+    """RF-08 / RN-09: si no se despacha el lote sugerido por FEFO, el motivo es obligatorio."""
     stock = Stock.objects.select_related("lote__producto", "ubicacion").get(pk=stock.pk)
     lote = stock.lote
     if lote.estado != Lote.DISPONIBLE or lote.esta_vencido(hoy):
@@ -51,7 +51,7 @@ def registrar_salida(*, stock, cantidad, usuario, motivo="", hoy=None):
 
 @transaction.atomic
 def transferir(*, stock, destino, cantidad, usuario, motivo=""):
-    """RF-11: mueve cajas de un lote entre ubicaciones validando stock y capacidad."""
+    """RF-09: mueve cajas de un lote entre ubicaciones validando stock y capacidad."""
     stock = Stock.objects.select_related("lote__producto", "ubicacion").get(pk=stock.pk)
     if destino.pk == stock.ubicacion_id:
         raise ReglaNegocioError("La ubicación de destino debe ser distinta a la de origen.")

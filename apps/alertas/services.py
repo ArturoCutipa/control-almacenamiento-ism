@@ -1,4 +1,4 @@
-"""Generación diaria de alertas de vencimiento (RF-14, RN-11) y bloqueo de lotes vencidos (RN-12)."""
+"""Generación diaria de alertas de vencimiento (RF-12, RN-11) y bloqueo de lotes vencidos (RN-12)."""
 from datetime import timedelta
 
 from django.conf import settings
