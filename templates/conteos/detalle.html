@@ -29,7 +29,7 @@
             <td>{% if d.estado == 'PENDIENTE' %}
                   {% if ES_ENCARGADO %}
                   <form method="post" action="{% url 'conteos:revisar' d.pk %}" class="d-flex flex-column gap-1">{% csrf_token %}
-                    <input name="motivo" class="form-control form-control-sm" placeholder="Motivo (obligatorio para aprobar)" aria-label="Motivo">
+                    <input name="motivo" class="form-control form-control-sm" placeholder="Motivo (obligatorio)" required aria-label="Motivo">
                     <div class="d-flex gap-1"><button name="accion" value="aprobar" class="btn btn-success btn-sm">Aprobar ajuste</button>
                     <button name="accion" value="rechazar" class="btn btn-outline-danger btn-sm">Reconteo</button></div></form>
                   {% else %}<span class="badge bg-warning text-dark">Pendiente de aprobación</span>{% endif %}

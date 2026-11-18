@@ -44,9 +44,11 @@ def aprobar_ajuste(*, detalle, motivo, encargado):
     motivo = (motivo or "").strip()
     if not motivo:
         raise ReglaNegocioError("Indique el motivo del ajuste (RN-13).")
-    stock, _ = Stock.objects.get_or_create(lote=detalle.lote, ubicacion=detalle.ubicacion)
-    inventario.ajustar(stock, detalle.diferencia)
     es_ingreso = detalle.diferencia > 0
+    if es_ingreso:  # RN-07: las cajas sobrantes también deben caber en la ubicación
+        stock = inventario.incrementar(detalle.lote, detalle.ubicacion, detalle.diferencia)
+    else:  # RN-10: nunca deja stock negativo
+        stock = inventario.descontar(detalle.lote, detalle.ubicacion, -detalle.diferencia)
     Movimiento.objects.create(
         tipo=Movimiento.AJUSTE, lote=detalle.lote, cantidad=detalle.diferencia, motivo=motivo, usuario=encargado,
         ubicacion_destino=detalle.ubicacion if es_ingreso else None,
@@ -61,10 +63,16 @@ def aprobar_ajuste(*, detalle, motivo, encargado):
     return detalle
 
 
+@transaction.atomic
 def rechazar_ajuste(*, detalle, motivo, encargado):
+    """RF-14: el rechazo (reconteo) también exige indicar el motivo."""
+    detalle = DetalleConteo.objects.select_for_update().select_related("lote", "ubicacion").get(pk=detalle.pk)
     if detalle.estado != DetalleConteo.PENDIENTE:
         raise ReglaNegocioError("Esta diferencia ya fue revisada.")
-    detalle.estado, detalle.motivo = DetalleConteo.RECHAZADO, (motivo or "Se solicita reconteo").strip()
+    motivo = (motivo or "").strip()
+    if not motivo:
+        raise ReglaNegocioError("Indique el motivo del rechazo (RF-14).")
+    detalle.estado, detalle.motivo = DetalleConteo.RECHAZADO, motivo
     detalle.revisado_por, detalle.fecha_revision = encargado, timezone.now()
     detalle.save()
     registrar(encargado, "AJUSTE_RECHAZADO",

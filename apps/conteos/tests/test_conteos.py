@@ -38,5 +38,21 @@ class ConteoTests(TestCase):
     def test_rechazo_no_modifica_el_stock(self):
         d = services.registrar_conteo(conteo=self.conteo, ubicacion=self.ubic, lote=self.lote, cant_fisica=80,
                                       usuario=self.op)
-        services.rechazar_ajuste(detalle=d, motivo="", encargado=self.enc)
+        with self.assertRaises(ReglaNegocioError):  # RF-14: el rechazo también exige motivo
+            services.rechazar_ajuste(detalle=d, motivo="", encargado=self.enc)
+        services.rechazar_ajuste(detalle=d, motivo="Contar de nuevo la fila", encargado=self.enc)
+        d.refresh_from_db()
+        self.assertEqual(d.estado, DetalleConteo.RECHAZADO)
         self.assertEqual(Stock.objects.get(lote=self.lote).cantidad_cajas, 100)
+
+    def test_rn07_ajuste_positivo_respeta_la_capacidad(self):
+        # Ubicación de 4 pallets x 80 cajas = 320 cajas; ya tiene 100 (2 pallets).
+        d = services.registrar_conteo(conteo=self.conteo, ubicacion=self.ubic, lote=self.lote, cant_fisica=400,
+                                      usuario=self.op)
+        with self.assertRaises(ReglaNegocioError):
+            services.aprobar_ajuste(detalle=d, motivo="Sobrante", encargado=self.enc)
+        self.assertEqual(Stock.objects.get(lote=self.lote).cantidad_cajas, 100)
+        d2 = services.registrar_conteo(conteo=self.conteo, ubicacion=self.ubic, lote=self.lote, cant_fisica=110,
+                                       usuario=self.op)
+        services.aprobar_ajuste(detalle=d2, motivo="Sobrante", encargado=self.enc)
+        self.assertEqual(Stock.objects.get(lote=self.lote).cantidad_cajas, 110)
