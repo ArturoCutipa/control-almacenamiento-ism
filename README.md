@@ -73,3 +73,13 @@ activan las cookies seguras, HSTS y la redirección a HTTPS (detrás de Nginx). 
 | RF-15 | CU-15 Exportar a SAP (Excel) | `/sap/` | `integracion_sap` | Encargado, Administrador |
 | RF-16 | CU-16 Reportes PDF y Excel | `/reportes/` | `reportes` | Planificación, Encargado, Administrador |
 | RF-17 | CU-17 Consultar bitácora | `/bitacora/` | `bitacora` | Administrador |
+
+## Equipo
+
+Proyecto desarrollado para el curso de Gestión, ISM – Tacna.
+
+| Integrante | GitHub |
+|------------|--------|
+| Arturo Cutipa Flores | [@ArturoCutipa](https://github.com/ArturoCutipa) |
+| Carlos Raí Jimenez Laura | [@CarlosJimenez21](https://github.com/CarlosJimenez21) |
+| Milagros Ludeña | [@ml-305](https://github.com/ml-305) |
