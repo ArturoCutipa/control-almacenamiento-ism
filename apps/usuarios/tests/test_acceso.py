@@ -24,6 +24,13 @@ class AccesoPorRolTests(TestCase):
         self.assertEqual(r.status_code, 302)
         self.assertTrue(Bitacora.objects.filter(accion="INICIO_SESION").exists())
 
+    def test_login_fallido_queda_en_bitacora_sin_la_contrasena(self):
+        r = self.client.post(reverse("usuarios:login"), {"username": "operario", "password": "clave-equivocada"})
+        self.assertEqual(r.status_code, 200)
+        registro = Bitacora.objects.get(accion="INICIO_FALLIDO")
+        self.assertIn("operario", registro.detalle)
+        self.assertNotIn("clave-equivocada", registro.detalle)
+
     def test_usuario_inactivo_no_ingresa(self):
         u = self.usuarios[Rol.OPERARIO]
         u.is_active = False
