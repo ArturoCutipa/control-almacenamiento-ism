@@ -67,7 +67,20 @@ a { text-decoration-thickness: .08em; text-underline-offset: .18em; }
 .barra-ism .navbar-toggler { border-color: rgba(255, 255, 255, .5); }
 .barra-ism .navbar-toggler:focus { box-shadow: 0 0 0 .2rem rgba(255, 255, 255, .25); }
 
+/* El menú desplegable va SIEMPRE en claro: la barra usa data-bs-theme="dark" y, sin
+   esto, Bootstrap 5.3 lo pinta con fondo oscuro y el texto queda ilegible. */
 .barra-ism .dropdown-menu {
+  --bs-dropdown-bg: #fff;
+  --bs-dropdown-color: var(--ism-tinta);
+  --bs-dropdown-link-color: var(--ism-tinta);
+  --bs-dropdown-link-hover-bg: var(--ism-verde-claro);
+  --bs-dropdown-link-hover-color: var(--ism-verde-oscuro);
+  --bs-dropdown-link-active-bg: var(--ism-verde);
+  --bs-dropdown-link-active-color: #fff;
+  --bs-dropdown-divider-bg: var(--ism-borde);
+  --bs-dropdown-header-color: #5d6b63;
+  background-color: #fff;
+  color: var(--ism-tinta);
   border: 1px solid var(--ism-borde);
   border-radius: .8rem;
   box-shadow: var(--ism-sombra-alta);
@@ -79,10 +92,17 @@ a { text-decoration-thickness: .08em; text-underline-offset: .18em; }
   padding: .55rem .7rem;
   font-weight: 500;
   color: var(--ism-tinta);
+  background-color: transparent;
 }
 .barra-ism .dropdown-item:hover,
-.barra-ism .dropdown-item:focus { background: var(--ism-verde-claro); color: var(--ism-verde-oscuro); }
+.barra-ism .dropdown-item:focus {
+  background-color: var(--ism-verde-claro);
+  color: var(--ism-verde-oscuro);
+}
+.barra-ism .dropdown-item:active { background-color: var(--ism-verde); color: #fff; }
+.barra-ism .dropdown-item:active .bi { color: #fff; }
 .barra-ism .dropdown-item .bi { width: 1.3rem; color: var(--ism-verde); }
+.barra-ism .dropdown-divider { border-top-color: var(--ism-borde); opacity: 1; }
 
 /* Bloque del usuario a la derecha */
 .barra-ism .usuario-sesion {
