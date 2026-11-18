@@ -1,6 +1,9 @@
 """Configuración del Sistema de Control de Almacenamiento e Inventario - ISM."""
 import os
+import sys
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -9,7 +12,7 @@ def _cargar_env(ruta):
     """Carga las variables de un archivo .env sin sobrescribir las ya definidas."""
     if not ruta.exists():
         return
-    for linea in ruta.read_text(encoding="utf-8").splitlines():
+    for linea in ruta.read_text(encoding="utf-8-sig").splitlines():
         linea = linea.strip()
         if not linea or linea.startswith("#") or "=" not in linea:
             continue
@@ -28,8 +31,11 @@ def env_bool(clave, defecto=False):
     return str(env(clave, defecto)).lower() in ("1", "true", "yes", "si", "sí")
 
 
+TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 DEBUG = env_bool("DJANGO_DEBUG", False)
 SECRET_KEY = env("DJANGO_SECRET_KEY", "solo-para-desarrollo")
+if not DEBUG and not TESTING and SECRET_KEY in ("solo-para-desarrollo", "cambiar-esta-clave-en-produccion"):
+    raise ImproperlyConfigured("Defina DJANGO_SECRET_KEY con una clave propia antes de usar DEBUG=False.")
 ALLOWED_HOSTS = [h.strip() for h in env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in env("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]
 
@@ -131,7 +137,7 @@ MESSAGE_TAGS = {40: "danger"}
 ALERTA_DIAS_VENCIMIENTO = int(env("ALERTA_DIAS_VENCIMIENTO", "30"))  # RN-11
 
 # Seguridad en producción (HTTPS detrás de Nginx)
-if not DEBUG:
+if not DEBUG and not TESTING:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
