@@ -38,9 +38,11 @@
             {% if ES_ENCARGADO %}
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{% url 'integracion_sap:exportar' %}"><i class="bi bi-file-earmark-excel"></i> Exportar a SAP</a></li>
-            <li><a class="dropdown-item" href="{% url 'bitacora:lista' %}"><i class="bi bi-journal-text"></i> Bitácora</a></li>
             {% endif %}
-            {% if ES_ADMIN %}<li><a class="dropdown-item" href="{% url 'usuarios:lista' %}"><i class="bi bi-people"></i> Usuarios</a></li>{% endif %}
+            {% if ES_ADMIN %}
+            <li><a class="dropdown-item" href="{% url 'bitacora:lista' %}"><i class="bi bi-journal-text"></i> Bitácora</a></li>
+            <li><a class="dropdown-item" href="{% url 'usuarios:lista' %}"><i class="bi bi-people"></i> Usuarios</a></li>
+            {% endif %}
           </ul>
         </li>
       </ul>

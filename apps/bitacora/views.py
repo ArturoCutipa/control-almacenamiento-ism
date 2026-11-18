@@ -3,12 +3,12 @@ from django.shortcuts import render
 
 from apps.filtros import entero, fecha_iso
 from apps.usuarios.models import Usuario
-from apps.usuarios.permisos import ADMIN, ENCARGADO, rol_requerido
+from apps.usuarios.permisos import ADMIN, rol_requerido
 
 from .models import Bitacora
 
 
-@rol_requerido(ADMIN, ENCARGADO)
+@rol_requerido(ADMIN)  # RF-17: solo el Administrador
 def lista(request):
     registros = Bitacora.objects.select_related("usuario")
     f = {k: request.GET.get(k, "").strip() for k in ("desde", "hasta", "usuario", "accion")}

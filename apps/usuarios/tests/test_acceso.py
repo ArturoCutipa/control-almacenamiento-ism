@@ -40,6 +40,10 @@ class AccesoPorRolTests(TestCase):
             (Rol.PLANIFICACION, "alertas:lista", 200),
             (Rol.ENCARGADO, "integracion_sap:exportar", 200),
             (Rol.ENCARGADO, "usuarios:lista", 403),
+            (Rol.ENCARGADO, "bitacora:lista", 403),
+            (Rol.PLANIFICACION, "bitacora:lista", 403),
+            (Rol.OPERARIO, "bitacora:lista", 403),
+            (Rol.ADMIN, "bitacora:lista", 200),
             (Rol.ADMIN, "usuarios:lista", 200),
         ]
         for rol, url, esperado in casos:

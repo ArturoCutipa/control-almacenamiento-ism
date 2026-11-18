@@ -72,4 +72,4 @@ activan las cookies seguras, HSTS y la redirección a HTTPS (detrás de Nginx). 
 | RF-14 | CU-14 Aprobar/rechazar ajuste con motivo | `/conteos/<id>/` | `conteos` | Encargado, Administrador |
 | RF-15 | CU-15 Exportar a SAP (Excel) | `/sap/` | `integracion_sap` | Encargado, Administrador |
 | RF-16 | CU-16 Reportes PDF y Excel | `/reportes/` | `reportes` | Planificación, Encargado, Administrador |
-| RF-17 | CU-17 Consultar bitácora | `/bitacora/` | `bitacora` | Administrador, Encargado |
+| RF-17 | CU-17 Consultar bitácora | `/bitacora/` | `bitacora` | Administrador |
