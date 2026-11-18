@@ -24,7 +24,18 @@ class UbicacionForm(forms.ModelForm):
             existe = Ubicacion.objects.filter(zona=zona, nivel=nivel, posicion=posicion).exclude(pk=self.instance.pk)
             if existe.exists():
                 raise forms.ValidationError("Ya existe una ubicación con esa zona, nivel y posición.")
-        cap = datos.get("capacidad_pallets")
-        if self.instance.pk and cap and cap < self.instance.pallets_ocupados():
-            self.add_error("capacidad_pallets", "La capacidad no puede ser menor que los pallets ocupados actualmente.")
+        if self.instance.pk:
+            ocupados = self.instance.pallets_ocupados()
+            cap = datos.get("capacidad_pallets")
+            if cap and cap < ocupados:
+                self.add_error("capacidad_pallets",
+                               "La capacidad no puede ser menor que los pallets ocupados actualmente.")
+            if ocupados:
+                if datos.get("activa") is False:
+                    self.add_error("activa", "No se puede desactivar una ubicación con stock; transfiéralo antes.")
+                original = (self.instance.zona, self.instance.nivel, self.instance.posicion)
+                if zona and nivel and posicion and (zona, nivel, posicion) != original:
+                    raise forms.ValidationError(
+                        "No se puede cambiar la zona, nivel o posición de una ubicación con stock: "
+                        "su código QR cambiaría y la etiqueta impresa dejaría de ser válida.")
         return datos
