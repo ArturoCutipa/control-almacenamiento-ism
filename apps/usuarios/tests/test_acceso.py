@@ -31,6 +31,13 @@ class AccesoPorRolTests(TestCase):
         self.assertIn("operario", registro.detalle)
         self.assertNotIn("clave-equivocada", registro.detalle)
 
+    def test_usuario_sin_rol_no_ingresa(self):
+        from apps.usuarios.models import Usuario
+        Usuario.objects.create_user(username="sinrol", password=pruebas.CLAVE)
+        r = self.client.post(reverse("usuarios:login"), {"username": "sinrol", "password": pruebas.CLAVE})
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, "no tiene un rol asignado")
+
     def test_usuario_inactivo_no_ingresa(self):
         u = self.usuarios[Rol.OPERARIO]
         u.is_active = False

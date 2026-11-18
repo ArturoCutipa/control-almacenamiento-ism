@@ -9,12 +9,19 @@ class LoginForm(AuthenticationForm):
     error_messages = {
         "invalid_login": "Usuario o contraseña incorrectos.",
         "inactive": "Su cuenta está desactivada. Comuníquese con el administrador.",
+        "sin_rol": "Su cuenta no tiene un rol asignado. Comuníquese con el administrador.",
     }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["username"].widget.attrs.update({"class": "form-control form-control-lg", "autofocus": True})
         self.fields["password"].widget.attrs.update({"class": "form-control form-control-lg"})
+
+    def confirm_login_allowed(self, user):
+        """RF-01: el panel muestra las funciones del rol, así que sin rol no se puede ingresar."""
+        super().confirm_login_allowed(user)
+        if user.codigo_rol is None:
+            raise forms.ValidationError(self.error_messages["sin_rol"], code="sin_rol")
 
 
 class UsuarioForm(forms.ModelForm):
