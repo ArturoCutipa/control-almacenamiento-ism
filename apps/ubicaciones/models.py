@@ -36,12 +36,18 @@ class Ubicacion(models.Model):
 
     def pallets_ocupados(self, excluir_stock=None):
         """Pallets ocupados: cada lote ocupa ceil(cajas / cajas_por_pallet) pallets."""
-        total = 0
-        stocks = self.stocks.filter(cantidad_cajas__gt=0).select_related("lote__producto")
-        if excluir_stock is not None:
-            stocks = stocks.exclude(pk=excluir_stock)
-        for s in stocks:
-            total += math.ceil(s.cantidad_cajas / s.lote.producto.cajas_por_pallet)
+        if excluir_stock is None and "_pallets_ocupados" in self.__dict__:
+            return self.__dict__["_pallets_ocupados"]
+        if excluir_stock is None and "stocks" in getattr(self, "_prefetched_objects_cache", {}):
+            # Usa los datos precargados con prefetch_related("stocks__lote__producto") (evita N+1).
+            stocks = [s for s in self.stocks.all() if s.cantidad_cajas > 0]
+        else:
+            stocks = self.stocks.filter(cantidad_cajas__gt=0).select_related("lote__producto")
+            if excluir_stock is not None:
+                stocks = stocks.exclude(pk=excluir_stock)
+        total = sum(math.ceil(s.cantidad_cajas / s.lote.producto.cajas_por_pallet) for s in stocks)
+        if excluir_stock is None:
+            self.__dict__["_pallets_ocupados"] = total  # se calcula una sola vez por objeto
         return total
 
     @property

@@ -15,7 +15,7 @@ from .services import pdf_etiquetas
 @rol_requerido(*TODOS)
 def lista(request):
     zona = request.GET.get("zona", "").strip().upper()
-    ubicaciones = Ubicacion.objects.all()
+    ubicaciones = Ubicacion.objects.prefetch_related("stocks__lote__producto")
     if zona:
         ubicaciones = ubicaciones.filter(zona=zona)
     zonas = Ubicacion.objects.order_by("zona").values_list("zona", flat=True).distinct()
