@@ -27,7 +27,8 @@ class UsuarioForm(forms.ModelForm):
         fields = ["username", "first_name", "last_name", "email", "rol", "is_active"]
         labels = {"username": "Usuario", "first_name": "Nombres", "last_name": "Apellidos", "is_active": "Activo"}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, editor=None, **kwargs):
+        self.editor = editor  # usuario que está guardando el formulario
         super().__init__(*args, **kwargs)
         self.fields["rol"].required = True
         self.fields["rol"].queryset = Rol.objects.all()
@@ -39,6 +40,12 @@ class UsuarioForm(forms.ModelForm):
 
     def clean(self):
         datos = super().clean()
+        if self.editor is not None and self.instance.pk and self.instance.pk == self.editor.pk:
+            if not datos.get("is_active", True):
+                self.add_error("is_active", "No puede desactivar su propia cuenta.")
+            rol = datos.get("rol")
+            if rol is not None and rol.codigo != Rol.ADMIN and not self.instance.is_superuser:
+                self.add_error("rol", "No puede quitarse el rol de Administrador a sí mismo.")
         p1, p2 = datos.get("password1"), datos.get("password2")
         if not self.instance.pk and not p1:
             self.add_error("password1", "Ingrese una contraseña para el nuevo usuario.")

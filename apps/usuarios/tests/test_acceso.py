@@ -4,6 +4,7 @@ from django.urls import reverse
 from apps import pruebas
 from apps.bitacora.models import Bitacora, BitacoraInmutableError
 from apps.bitacora.services import registrar
+from apps.usuarios.forms import UsuarioForm
 from apps.usuarios.models import Rol
 
 
@@ -82,3 +83,32 @@ class AccesoPorRolTests(TestCase):
             b.save()
         with self.assertRaises(BitacoraInmutableError):
             b.delete()
+
+
+class UsuarioFormTests(TestCase):
+    def setUp(self):
+        self.admin = pruebas.usuario(Rol.ADMIN)
+        self.rol_admin = Rol.objects.get(codigo=Rol.ADMIN)
+        self.rol_operario = Rol.objects.get(codigo=Rol.OPERARIO)
+
+    def datos(self, **cambios):
+        base = {"username": self.admin.username, "first_name": "Ana", "last_name": "Torres", "email": "",
+                "rol": self.rol_admin.pk, "is_active": True}
+        base.update(cambios)
+        return base
+
+    def test_admin_no_puede_desactivarse_desde_el_formulario(self):
+        form = UsuarioForm(self.datos(is_active=False), instance=self.admin, editor=self.admin)
+        self.assertFalse(form.is_valid())
+        self.assertIn("is_active", form.errors)
+
+    def test_admin_no_puede_quitarse_su_rol(self):
+        form = UsuarioForm(self.datos(rol=self.rol_operario.pk), instance=self.admin, editor=self.admin)
+        self.assertFalse(form.is_valid())
+        self.assertIn("rol", form.errors)
+
+    def test_admin_si_puede_desactivar_a_otro_usuario(self):
+        otro = pruebas.usuario(Rol.OPERARIO)
+        datos = self.datos(username=otro.username, rol=self.rol_operario.pk, is_active=False)
+        form = UsuarioForm(datos, instance=otro, editor=self.admin)
+        self.assertTrue(form.is_valid(), form.errors)

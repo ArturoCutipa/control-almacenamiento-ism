@@ -41,7 +41,7 @@ def lista(request):
 @rol_requerido(ADMIN)
 def editar(request, pk=None):
     usuario = get_object_or_404(Usuario, pk=pk) if pk else None
-    form = UsuarioForm(request.POST or None, instance=usuario)
+    form = UsuarioForm(request.POST or None, instance=usuario, editor=request.user)
     if request.method == "POST" and form.is_valid():
         nuevo = usuario is None
         usuario = form.save()
